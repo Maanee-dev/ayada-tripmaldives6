@@ -38,5 +38,5 @@ export const CONFIG = {
   // 1. If your frontend and backend are on the same server, leave this empty.
   // 2. If your backend is on Cloud Run, set this to your Cloud Run URL.
   // 3. Make sure to include https:// in the URL.
-  API_URL: import.meta.env.VITE_API_URL || '',
+  API_URL: import.meta.env.VITE_API_URL || 'https://wwww.tripmaldives.co',
 };
