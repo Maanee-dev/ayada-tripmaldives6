@@ -338,7 +338,6 @@ async function startServer() {
         );
       } catch (dbError) {
         console.error("SQLite insertion error:", dbError);
-        // Continue to Supabase even if SQLite fails
       }
 
       // Insert into Supabase
@@ -412,7 +411,6 @@ async function startServer() {
           
           previewUrl = nodemailer.getTestMessageUrl(info);
           console.log("Email sent successfully.");
-          if (previewUrl) console.log("Preview URL: %s", previewUrl);
         } catch (emailError) {
           console.error("Failed to send email:", emailError);
         }
@@ -427,6 +425,14 @@ async function startServer() {
       console.error("Database error:", error);
       res.status(500).json({ error: "Failed to save inquiry" });
     }
+  });
+
+  // IMPORTANT: Catch-all for any other /api/* routes that weren't matched
+  app.all("/api/*", (req, res) => {
+    res.status(404).json({ 
+      error: `API route not found: ${req.method} ${req.url}`,
+      suggestion: "Check if the API path is correct and the server is running."
+    });
   });
 
   app.get("/api/preview-email", (req, res) => {
