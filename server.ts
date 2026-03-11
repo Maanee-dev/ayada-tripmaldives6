@@ -277,7 +277,16 @@ async function startServer() {
   }));
 
   app.use(compression());
-  app.use(express.json());
+  app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+  // Request Logger for debugging on Hostinger
+  app.use((req, res, next) => {
+    if (req.url.startsWith('/api')) {
+      console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    }
+    next();
+  });
 
   // Health Check
   app.get("/api/health", (req, res) => {
@@ -286,6 +295,18 @@ async function startServer() {
       env: process.env.NODE_ENV,
       port: PORT,
       time: new Date().toISOString()
+    });
+  });
+
+  app.get("/api/ping", (req, res) => {
+    res.json({ message: "pong", time: new Date().toISOString() });
+  });
+
+  app.get("/api/test-cors", (req, res) => {
+    res.json({ 
+      message: "CORS is working", 
+      origin: req.headers.origin || "no origin header",
+      host: req.headers.host
     });
   });
 

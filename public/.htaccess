@@ -1,9 +1,13 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /index.html [L]
+  
+  # Do not redirect /api/ calls
+  RewriteCond %{REQUEST_URI} ^/api/ [NC]
+  RewriteRule .* - [L]
+
+  # For all other requests, let Node.js handle it
+  # Or if you are serving static files via Apache, use the following:
+  # RewriteCond %{REQUEST_FILENAME} !-f
+  # RewriteCond %{REQUEST_FILENAME} !-d
+  # RewriteRule . /index.html [L]
 </IfModule>

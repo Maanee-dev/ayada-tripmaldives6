@@ -32,7 +32,8 @@ export default function RequestQuote({ resort }: RequestQuoteProps) {
     setIsSubmitting(true);
     
     try {
-      const apiUrl = `${CONFIG.API_URL}/api/leads`;
+      // Use PHP backend for Hostinger shared hosting compatibility
+      const apiUrl = '/api/leads.php';
       console.log('Submitting inquiry to:', apiUrl);
       
       const response = await fetch(apiUrl, {

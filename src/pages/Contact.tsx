@@ -26,7 +26,8 @@ export default function Contact({ resort }: ContactProps) {
     setIsSubmitting(true);
     
     try {
-      const apiUrl = `${CONFIG.API_URL}/api/leads`;
+      // Use PHP backend for Hostinger shared hosting compatibility
+      const apiUrl = '/api/leads.php';
       console.log('Submitting contact form to:', apiUrl);
       
       const response = await fetch(apiUrl, {
