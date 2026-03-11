@@ -15,7 +15,7 @@ const db = new Database("leads.db");
 
 // Supabase Client for Server-side (using secrets as fallback)
 const supabaseUrl = process.env.VITE_SUPABASE_URL || SECRETS.VITE_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || SECRETS.SUPABASE_SERVICE_ROLE_KEY || SECRETS.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || SECRETS.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || SECRETS.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Initialize local database as backup
@@ -53,6 +53,7 @@ async function setupMailer() {
   const port = parseInt(process.env.SMTP_PORT || SECRETS.SMTP_PORT.toString());
   const user = process.env.SMTP_USER || SECRETS.SMTP_USER;
   const pass = process.env.SMTP_PASS || SECRETS.SMTP_PASS;
+  const from = process.env.SMTP_FROM || SECRETS.SMTP_FROM;
 
   if (host && user && pass) {
     transporter = nodemailer.createTransport({
@@ -259,12 +260,15 @@ async function startServer() {
 
   app.use(cors({
     origin: [
+      "https://www.tripmaldives.co",
+      "https://tripmaldives.co",
       "https://www.ayada.tripmaldives.co",
       "https://ayada.tripmaldives.co",
       "http://localhost:3000",
       "http://localhost:5173",
       /\.run\.app$/ // Allow all Cloud Run subdomains
     ],
+    allowedHeaders: ["Content-Type", "X-API-Key", "Authorization"],
     credentials: true
   }));
 
@@ -340,7 +344,7 @@ async function startServer() {
           }]);
 
         if (supabaseError) {
-          console.error("Supabase insertion error:", supabaseError);
+          console.error("Supabase insertion error:", JSON.stringify(supabaseError, null, 2));
         }
       } catch (sError) {
         console.error("Supabase service error:", sError);
@@ -353,8 +357,8 @@ async function startServer() {
       // Send email
       if (transporter && email) {
         try {
-          const fromEmail = process.env.SMTP_FROM || '"TripMaldives" <reservations@tripmaldives.co>';
-          const adminEmail = process.env.SMTP_USER || 'reservations@tripmaldives.co';
+          const fromEmail = process.env.SMTP_FROM || SECRETS.SMTP_FROM || '"TripMaldives" <hello@maldives-serenitytravels.com>';
+          const adminEmail = process.env.SMTP_USER || SECRETS.SMTP_USER || 'hello@maldives-serenitytravels.com';
 
           // 1. Send confirmation to the customer
           const info = await transporter.sendMail({

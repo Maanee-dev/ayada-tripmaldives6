@@ -31,12 +31,12 @@ export const CONFIG = {
   },
 
   // App URL
-  APP_URL: process.env.APP_URL || 'https://wwww.tripmaldives.co',
+  APP_URL: process.env.APP_URL || 'https://www.tripmaldives.co',
 
   // API URL for client-side requests
-  // IMPORTANT for Hostinger: 
-  // 1. If your frontend and backend are on the same server, leave this empty.
-  // 2. If your backend is on Cloud Run, set this to your Cloud Run URL.
-  // 3. Make sure to include https:// in the URL.
-  API_URL: import.meta.env.VITE_API_URL || 'https://wwww.tripmaldives.co',
+  // IMPORTANT: 
+  // 1. For local development and AI Studio preview, leave this as '' (empty string).
+  // 2. For Hostinger, if your backend is on Cloud Run, set this to your Cloud Run URL.
+  // 3. If your backend is on the same Hostinger server, leave this as ''.
+  API_URL: import.meta.env.VITE_API_URL || '',
 };

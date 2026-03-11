@@ -32,7 +32,10 @@ export default function RequestQuote({ resort }: RequestQuoteProps) {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch(`${CONFIG.API_URL}/api/leads`, {
+      const apiUrl = `${CONFIG.API_URL}/api/leads`;
+      console.log('Submitting inquiry to:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -45,14 +48,16 @@ export default function RequestQuote({ resort }: RequestQuoteProps) {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to submit');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Submission failed with status: ${response.status}`);
+      }
       
       const data = await response.json();
-      
       navigate('/thank-you', { state: { previewUrl: data.previewUrl } });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting lead:', error);
-      alert('There was an error submitting your request. Please try again or contact us directly.');
+      alert(`Error submitting request: ${error.message || 'Please try again or contact us directly.'}`);
     } finally {
       setIsSubmitting(false);
     }
