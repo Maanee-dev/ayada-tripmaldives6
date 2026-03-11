@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
+import { fileURLToPath } from 'url';
 import compression from "compression";
 import Database from "better-sqlite3";
 import nodemailer from "nodemailer";
@@ -10,6 +11,9 @@ import cors from 'cors';
 import { SECRETS } from './secrets';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const db = new Database("leads.db");
 
@@ -256,7 +260,7 @@ function getEmailHtml(data: any) {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   app.use(cors({
     origin: [
@@ -275,7 +279,21 @@ async function startServer() {
   app.use(compression());
   app.use(express.json());
 
+  // Health Check
+  app.get("/api/health", (req, res) => {
+    res.json({ 
+      status: "ok", 
+      env: process.env.NODE_ENV,
+      port: PORT,
+      time: new Date().toISOString()
+    });
+  });
+
   // API Routes
+  app.get("/api/leads", (req, res) => {
+    res.status(405).json({ error: "Method Not Allowed. Use POST to submit inquiries." });
+  });
+
   app.post("/api/leads", async (req, res) => {
     // API Key Verification
     const apiKey = req.headers['x-api-key'];
@@ -503,12 +521,12 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.join(process.cwd(), "dist"), {
+    app.use(express.static(path.join(__dirname, "dist"), {
       maxAge: '1y',
       etag: true
     }));
     app.get("*", (req, res) => {
-      res.sendFile(path.join(process.cwd(), "dist", "index.html"));
+      res.sendFile(path.join(__dirname, "dist", "index.html"));
     });
   }
 

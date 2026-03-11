@@ -45,11 +45,24 @@ export default function Contact({ resort }: ContactProps) {
         }),
       });
 
+      const contentType = response.headers.get('content-type');
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Submission failed with status: ${response.status}`);
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Submission failed with status: ${response.status}`);
+        } else {
+          const text = await response.text();
+          if (text.includes('<!doctype html>') || text.includes('<html')) {
+            throw new Error(`Server returned HTML instead of JSON. This usually means the API route was not found or redirected to the home page. Status: ${response.status}`);
+          }
+          throw new Error(`Submission failed with status: ${response.status}`);
+        }
       }
       
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server did not return a JSON response. Please check your backend configuration.');
+      }
+
       const data = await response.json();
       navigate('/thank-you', { state: { previewUrl: data.previewUrl } });
     } catch (error: any) {
