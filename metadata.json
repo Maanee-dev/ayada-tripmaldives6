@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Copy of Copy of Maldives Serenity Travels | Luxury Resort Platform",
+  "description": "Exclusive Maldives resort bookings and private quotations managed by Maldives Serenity Travels.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
